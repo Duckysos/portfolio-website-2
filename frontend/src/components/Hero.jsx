@@ -98,19 +98,6 @@ const Hero = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.6 }}
                 >
-                    <a href="#projects" style={{
-                        padding: '1rem 2.5rem',
-                        background: 'var(--primary-color)',
-                        color: 'white',
-                        borderRadius: '50px',
-                        fontWeight: 'bold',
-                        fontSize: '1.1rem',
-                        boxShadow: '0 10px 20px rgba(109, 40, 217, 0.3)',
-                        transition: 'transform 0.3s ease',
-                        display: 'inline-block'
-                    }}>
-                        View Work
-                    </a>
                 </motion.div>
             </div>
         </section>
