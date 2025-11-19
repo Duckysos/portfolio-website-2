@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const projects = [
@@ -80,7 +81,7 @@ const Projects = () => {
                     transition={{ duration: 0.5, delay: 0.5 }}
                     style={{ textAlign: 'center', marginTop: '4rem' }}
                 >
-                    <a href="/projects" style={{
+                    <Link to="/projects" style={{
                         padding: '1rem 2.5rem',
                         background: 'transparent',
                         border: '2px solid var(--primary-color)',
@@ -103,7 +104,7 @@ const Projects = () => {
                         }}
                     >
                         View All Projects
-                    </a>
+                    </Link>
                 </motion.div>
             </div>
         </section>
