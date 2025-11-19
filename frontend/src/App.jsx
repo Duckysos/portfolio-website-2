@@ -9,6 +9,7 @@ import Footer from './components/Footer';
 import ProjectsPage from './pages/ProjectsPage';
 import LearningPage from './pages/LearningPage';
 import SecretPage from './pages/SecretPage';
+import ScrollToTop from './components/ScrollToTop';
 
 // Home Component to keep the single-page scroll layout for the main landing
 const Home = () => (
@@ -23,6 +24,7 @@ const Home = () => (
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <KonamiCodeListener />
       <div className="app">
         <Navbar />
