@@ -39,7 +39,7 @@ const About = () => {
                             />
                         </motion.div>
 
-                        <h2 className="gradient-text" style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>About Me</h2>
+                        <h2 className="gradient-text" style={{ fontSize: 'clamp(2rem, 5vw, 2.5rem)', marginBottom: '1rem' }}>About Me</h2>
                         <p style={{ fontSize: '1.1rem', lineHeight: '1.8', marginBottom: '1.5rem', color: '#ddd', maxWidth: '700px' }}>
                             I am a Computer Science Graduate from the University of Edinburgh with a strong foundation in software engineering, data science and machine algorithms.
                             My main field of interest is Data Science and AI and its applications in solving real-world problems.

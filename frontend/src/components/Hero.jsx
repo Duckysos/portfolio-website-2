@@ -58,7 +58,12 @@ const Hero = () => {
                     whileInView={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.8, delay: 0.2 }}
                     className="gradient-text"
-                    style={{ fontSize: '5rem', fontWeight: '800', marginBottom: '1.5rem', lineHeight: 1.1 }}
+                    style={{
+                        fontSize: 'clamp(3rem, 8vw, 5rem)',
+                        fontWeight: '800',
+                        marginBottom: '1.5rem',
+                        lineHeight: 1.1
+                    }}
                 >
                     IAN KHO
                 </motion.h1>
@@ -66,7 +71,11 @@ const Hero = () => {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.3 }}
-                    style={{ fontSize: '2rem', marginBottom: '1rem', color: 'white' }}
+                    style={{
+                        fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+                        marginBottom: '1rem',
+                        color: 'white'
+                    }}
                 >
                     Full Stack ML Engineer
                 </motion.h3>
@@ -74,7 +83,13 @@ const Hero = () => {
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     transition={{ duration: 0.8, delay: 0.4 }}
-                    style={{ fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto 2rem', color: '#ccc' }}
+                    style={{
+                        fontSize: 'clamp(1rem, 3vw, 1.2rem)',
+                        maxWidth: '600px',
+                        margin: '0 auto 2rem',
+                        color: '#ccc',
+                        padding: '0 1rem'
+                    }}
                 >
                     I like working with data :)
                 </motion.p>
@@ -91,7 +106,8 @@ const Hero = () => {
                         fontWeight: 'bold',
                         fontSize: '1.1rem',
                         boxShadow: '0 10px 20px rgba(109, 40, 217, 0.3)',
-                        transition: 'transform 0.3s ease'
+                        transition: 'transform 0.3s ease',
+                        display: 'inline-block'
                     }}>
                         View Work
                     </a>
