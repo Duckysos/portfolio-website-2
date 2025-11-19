@@ -20,18 +20,6 @@ const projects = [
         description: "Built a RESTful microservice for asynchronous message routing using messaging queues and in-memory storage. Designed modular components and carried out integration testing.",
         tags: ["Java/Python", "Spring Boot/FastAPI", "Kafka", "Redis", "Docker"],
         color: "var(--accent-color)"
-    },
-    {
-        title: "PizzaDronz Application",
-        description: "Developed the back end for a drone based pizza delivery service. Implemented an A* based flight pathing system and an order validation module.",
-        tags: ["Java", "JUnit", "Algorithms (A*)", "JSON"],
-        color: "#10b981" // Emerald Green
-    },
-    {
-        title: "Agent-Based Modelling of UK Dietary Shifts",
-        description: "Developed a hybrid agent-based model to simulate UK dietary behavior changes under social, governmental, and media pressures. Ran large scale experiments and validated model outputs.",
-        tags: ["Python", "Mesa", "Pandas", "NumPy"],
-        color: "#f59e0b" // Amber
     }
 ];
 
@@ -46,7 +34,7 @@ const Projects = () => {
                     className="gradient-text"
                     style={{ fontSize: '3rem', marginBottom: '3rem', textAlign: 'center' }}
                 >
-                    Selected Works
+                    Projects
                 </motion.h2>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
                     {projects.map((project, index) => (
