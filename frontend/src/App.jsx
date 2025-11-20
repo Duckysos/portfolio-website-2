@@ -9,7 +9,10 @@ import Footer from './components/Footer';
 import ProjectsPage from './pages/ProjectsPage';
 import LearningPage from './pages/LearningPage';
 import SecretPage from './pages/SecretPage';
+import LoginPage from './pages/LoginPage';
+import AdminPage from './pages/AdminPage';
 import ScrollToTop from './components/ScrollToTop';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Home Component to keep the single-page scroll layout for the main landing
 const Home = () => (
@@ -20,27 +23,6 @@ const Home = () => (
     <Contact />
   </>
 );
-
-function App() {
-  return (
-    <Router>
-      <ScrollToTop />
-      <KonamiCodeListener />
-      <div className="app">
-        <Navbar />
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/projects" element={<ProjectsPage />} />
-            <Route path="/learning" element={<LearningPage />} />
-            <Route path="/secret-vault" element={<SecretPage />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </Router>
-  );
-}
 
 const KonamiCodeListener = () => {
   const navigate = useNavigate();
@@ -75,5 +57,35 @@ const KonamiCodeListener = () => {
 
   return null;
 };
+
+function App() {
+  return (
+    <Router>
+      <ScrollToTop />
+      <KonamiCodeListener />
+      <div className="app">
+        <Navbar />
+        <main>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/learning" element={<LearningPage />} />
+            <Route path="/secret-vault" element={<SecretPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminPage />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </Router>
+  );
+}
 
 export default App;

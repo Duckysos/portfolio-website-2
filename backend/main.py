@@ -1,13 +1,19 @@
-from fastapi import FastAPI, BackgroundTasks, Request, HTTPException
+from fastapi import FastAPI, BackgroundTasks, Request, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel, EmailStr
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from dotenv import load_dotenv
 import os
 from datetime import datetime, timedelta
+from sqlalchemy.orm import Session
+import database, models, schemas, crud, auth
 
 # Load environment variables
 load_dotenv()
+
+# Create DB tables
+models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI()
 
@@ -59,6 +65,73 @@ def check_rate_limit(ip: str):
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the Portfolio API"}
+
+# --- Auth Endpoints ---
+@app.post("/token", response_model=schemas.Token)
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(auth.get_db)):
+    user = db.query(models.User).filter(models.User.username == form_data.username).first()
+    if not user or not auth.verify_password(form_data.password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = auth.create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+# Temporary endpoint to create the first user (Remove in production or secure it)
+@app.post("/create-admin")
+def create_admin(user: schemas.UserInDB, db: Session = Depends(auth.get_db)):
+    # Check if user exists
+    existing_user = db.query(models.User).filter(models.User.username == user.username).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="User already exists")
+    
+    hashed_password = auth.get_password_hash(user.hashed_password)
+    db_user = models.User(username=user.username, password_hash=hashed_password)
+    db.add(db_user)
+    db.commit()
+    return {"message": "Admin created"}
+
+# --- Projects Endpoints ---
+@app.get("/projects", response_model=list[schemas.Project])
+def read_projects(skip: int = 0, limit: int = 100, db: Session = Depends(auth.get_db)):
+    projects = crud.get_projects(db, skip=skip, limit=limit)
+    return projects
+
+@app.post("/projects", response_model=schemas.Project)
+def create_project(project: schemas.ProjectCreate, current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(auth.get_db)):
+    return crud.create_project(db=db, project=project)
+
+@app.put("/projects/{project_id}", response_model=schemas.Project)
+def update_project(project_id: int, project: schemas.ProjectCreate, current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(auth.get_db)):
+    db_project = crud.update_project(db, project_id, project)
+    if db_project is None:
+        raise HTTPException(status_code=404, detail="Project not found")
+    return db_project
+
+@app.delete("/projects/{project_id}")
+def delete_project(project_id: int, current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(auth.get_db)):
+    crud.delete_project(db, project_id)
+    return {"message": "Project deleted"}
+
+# --- Learning Logs Endpoints ---
+@app.get("/learning-logs", response_model=list[schemas.LearningLog])
+def read_learning_logs(skip: int = 0, limit: int = 100, db: Session = Depends(auth.get_db)):
+    logs = crud.get_learning_logs(db, skip=skip, limit=limit)
+    return logs
+
+@app.post("/learning-logs", response_model=schemas.LearningLog)
+def create_learning_log(log: schemas.LearningLogCreate, current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(auth.get_db)):
+    return crud.create_learning_log(db=db, log=log)
+
+@app.delete("/learning-logs/{log_id}")
+def delete_learning_log(log_id: int, current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(auth.get_db)):
+    crud.delete_learning_log(db, log_id)
+    return {"message": "Log deleted"}
 
 @app.post("/contact")
 async def submit_contact(form: ContactForm, request: Request, background_tasks: BackgroundTasks):

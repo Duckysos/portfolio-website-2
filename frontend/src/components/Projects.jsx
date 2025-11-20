@@ -1,29 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-
-const projects = [
-    {
-        title: "Neural Machine Translation System",
-        description: "Built an English to German translation model using a GRU encoder and decoder with attention. Added subword tokenization, a custom training loop, and BLEU score evaluation.",
-        tags: ["Python", "PyTorch", "NumPy", "Matplotlib"],
-        color: "var(--primary-color)"
-    },
-    {
-        title: "Sentiment Classification System",
-        description: "Created a sentiment analysis pipeline for IMDB reviews using custom tokenizers and feature extraction. Trained a logistic regression model with both count features and embedding features.",
-        tags: ["Python", "scikit-learn", "NumPy", "Pandas"],
-        color: "var(--secondary-color)"
-    },
-    {
-        title: "Distributed Messaging Service",
-        description: "Built a RESTful microservice for asynchronous message routing using messaging queues and in-memory storage. Designed modular components and carried out integration testing.",
-        tags: ["Java/Python", "Spring Boot/FastAPI", "Kafka", "Redis", "Docker"],
-        color: "var(--accent-color)"
-    }
-];
+import { FaGithub } from 'react-icons/fa';
+import api from '../api';
 
 const Projects = () => {
+    const [projects, setProjects] = useState([]);
+
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                const response = await api.get('/projects');
+                setProjects(response.data.slice(0, 3)); // Show only top 3 on home
+            } catch (err) {
+                console.error("Error fetching projects", err);
+            }
+        };
+        fetchProjects();
+    }, []);
+
     return (
         <section id="projects" className="section">
             <div className="container">
@@ -52,12 +47,19 @@ const Projects = () => {
                                 <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>{project.title}</h3>
                                 <p style={{ color: '#ccc', marginBottom: '1.5rem', lineHeight: '1.6' }}>{project.description}</p>
                             </div>
-                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                {project.tags.map(tag => (
-                                    <span key={tag} style={{ fontSize: '0.8rem', padding: '0.3rem 0.8rem', background: 'rgba(255,255,255,0.1)', borderRadius: '20px' }}>
-                                        {tag}
-                                    </span>
-                                ))}
+                            <div>
+                                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
+                                    {project.tags.map(tag => (
+                                        <span key={tag} style={{ fontSize: '0.8rem', padding: '0.3rem 0.8rem', background: 'rgba(255,255,255,0.1)', borderRadius: '20px' }}>
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                                {project.github_link && (
+                                    <a href={project.github_link} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white', textDecoration: 'none', fontWeight: 'bold' }}>
+                                        <FaGithub /> View Code
+                                    </a>
+                                )}
                             </div>
                         </motion.div>
                     ))}

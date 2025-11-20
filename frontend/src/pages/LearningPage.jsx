@@ -1,34 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-
-const learningLogs = [
-    {
-        date: "November 2025",
-        title: "Advanced React Patterns",
-        description: "Deep diving into React performance optimization, custom hooks, and advanced state management with Context API and Redux Toolkit.",
-        tags: ["React", "Performance", "State Management"]
-    },
-    {
-        date: "October 2025",
-        title: "FastAPI & Async Python",
-        description: "Exploring asynchronous programming in Python using FastAPI. Building high-performance APIs and understanding the ASGI standard.",
-        tags: ["Python", "FastAPI", "AsyncIO"]
-    },
-    {
-        date: "September 2025",
-        title: "Docker & Containerization",
-        description: "Learning how to containerize full-stack applications using Docker and Docker Compose for consistent development and deployment environments.",
-        tags: ["Docker", "DevOps", "Containers"]
-    },
-    {
-        date: "August 2025",
-        title: "Machine Learning Deployment",
-        description: "Studying best practices for deploying ML models to production, including model versioning, monitoring, and serving using tools like MLflow.",
-        tags: ["MLOps", "Deployment", "Python"]
-    }
-];
+import { FaGithub } from 'react-icons/fa';
+import api from '../api';
 
 const LearningPage = () => {
+    const [learningLogs, setLearningLogs] = useState([]);
+
+    useEffect(() => {
+        const fetchLogs = async () => {
+            try {
+                const response = await api.get('/learning-logs');
+                setLearningLogs(response.data);
+            } catch (err) {
+                console.error("Error fetching logs", err);
+            }
+        };
+        fetchLogs();
+    }, []);
+
     return (
         <div className="section" style={{ paddingTop: '120px', minHeight: '100vh' }}>
             <div className="container">
@@ -91,7 +80,7 @@ const LearningPage = () => {
                                 </span>
                                 <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>{log.title}</h3>
                                 <p style={{ color: '#ccc', marginBottom: '1.5rem', lineHeight: '1.6' }}>{log.description}</p>
-                                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
                                     {log.tags.map(tag => (
                                         <span key={tag} style={{
                                             fontSize: '0.8rem',
@@ -104,6 +93,11 @@ const LearningPage = () => {
                                         </span>
                                     ))}
                                 </div>
+                                {log.github_link && (
+                                    <a href={log.github_link} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary-color)', textDecoration: 'none', fontWeight: 'bold' }}>
+                                        <FaGithub /> View Code
+                                    </a>
+                                )}
                             </div>
                         </motion.div>
                     ))}
