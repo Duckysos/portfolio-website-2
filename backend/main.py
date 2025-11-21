@@ -32,17 +32,24 @@ app.add_middleware(
 )
 
 # Email Configuration
-conf = ConnectionConfig(
-    MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
-    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD"),
-    MAIL_FROM=os.getenv("MAIL_FROM"),
-    MAIL_PORT=int(os.getenv("MAIL_PORT", 587)),
-    MAIL_SERVER=os.getenv("MAIL_SERVER"),
-    MAIL_STARTTLS=True,
-    MAIL_SSL_TLS=False,
-    USE_CREDENTIALS=True,
-    VALIDATE_CERTS=True
-)
+mail_username = os.getenv("MAIL_USERNAME")
+mail_password = os.getenv("MAIL_PASSWORD")
+mail_from = os.getenv("MAIL_FROM")
+mail_server = os.getenv("MAIL_SERVER")
+
+conf = None
+if mail_username and mail_password and mail_from and mail_server:
+    conf = ConnectionConfig(
+        MAIL_USERNAME=mail_username,
+        MAIL_PASSWORD=mail_password,
+        MAIL_FROM=mail_from,
+        MAIL_PORT=int(os.getenv("MAIL_PORT", 587)),
+        MAIL_SERVER=mail_server,
+        MAIL_STARTTLS=True,
+        MAIL_SSL_TLS=False,
+        USE_CREDENTIALS=True,
+        VALIDATE_CERTS=True
+    )
 
 class ContactForm(BaseModel):
     name: str
@@ -146,6 +153,10 @@ async def submit_contact(form: ContactForm, request: Request, background_tasks: 
         raise HTTPException(status_code=429, detail="You can only send one message per day.")
 
     # 3. Send Email with Reply-To
+    if not conf:
+        print("Email configuration not found. Skipping email sending.")
+        return {"message": "Message received (Email not configured)"}
+
     message = MessageSchema(
         subject=f"New Contact Form Submission from {form.name}",
         recipients=[os.getenv("MAIL_USERNAME")],
