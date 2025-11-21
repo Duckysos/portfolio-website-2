@@ -75,6 +75,24 @@ def read_root():
     return {"message": "Welcome to the Portfolio API"}
 
 # --- Auth Endpoints ---
+
+class LoginDebug(BaseModel):
+    username: str
+    password: str
+
+@app.post("/debug-login")
+def debug_login(data: LoginDebug, db: Session = Depends(auth.get_db)):
+    user = db.query(models.User).filter(models.User.username == data.username).first()
+    if not user:
+        return {"status": "User not found", "username_received": data.username}
+    
+    is_correct = auth.verify_password(data.password, user.password_hash)
+    return {
+        "status": "User found",
+        "password_correct": is_correct,
+        "stored_hash_prefix": user.password_hash[:10] if user.password_hash else "None"
+    }
+
 @app.post("/token", response_model=schemas.Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(auth.get_db)):
     user = db.query(models.User).filter(models.User.username == form_data.username).first()
