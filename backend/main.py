@@ -92,10 +92,9 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 # Temporary endpoint to create the first user (Remove in production or secure it)
 @app.post("/create-admin")
 def create_admin(user: schemas.UserInDB, db: Session = Depends(auth.get_db)):
-    # Check if user exists
-    existing_user = db.query(models.User).filter(models.User.username == user.username).first()
-    if existing_user:
-        raise HTTPException(status_code=400, detail="User already exists")
+    # Check if ANY user exists (One-time setup)
+    if db.query(models.User).first():
+        raise HTTPException(status_code=403, detail="Admin account already exists. Setup is complete.")
     
     hashed_password = auth.get_password_hash(user.hashed_password)
     db_user = models.User(username=user.username, password_hash=hashed_password)
