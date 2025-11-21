@@ -21,6 +21,8 @@ app = FastAPI()
 origins = [
     "http://localhost:5173",  # Vite default port
     "http://localhost:3000",
+    "https://iankho.xyz",     # Custom Domain
+    "https://www.iankho.xyz", # Custom Domain (www)
 ]
 
 app.add_middleware(
