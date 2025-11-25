@@ -29,4 +29,5 @@ class LearningLog(Base):
     tags = Column(String) # Storing as comma-separated string or JSON string
     github_link = Column(String)
     date = Column(String) # Or DateTime if strict sorting needed, but string matches frontend for now
+    position = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)

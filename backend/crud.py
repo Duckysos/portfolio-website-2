@@ -47,7 +47,7 @@ def update_project(db: Session, project_id: int, project: schemas.ProjectCreate)
 
 # Learning Logs
 def get_learning_logs(db: Session, skip: int = 0, limit: int = 100):
-    logs = db.query(models.LearningLog).offset(skip).limit(limit).all()
+    logs = db.query(models.LearningLog).order_by(models.LearningLog.position.asc()).offset(skip).limit(limit).all()
     for l in logs:
         if l.tags:
             l.tags = json.loads(l.tags)
@@ -71,4 +71,11 @@ def create_learning_log(db: Session, log: schemas.LearningLogCreate):
 
 def delete_learning_log(db: Session, log_id: int):
     db.query(models.LearningLog).filter(models.LearningLog.id == log_id).delete()
+    db.commit()
+
+def update_learning_log_positions(db: Session, positions: list[dict]):
+    for item in positions:
+        log = db.query(models.LearningLog).filter(models.LearningLog.id == item["id"]).first()
+        if log:
+            log.position = item["position"]
     db.commit()

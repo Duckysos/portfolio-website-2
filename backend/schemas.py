@@ -37,6 +37,7 @@ class LearningLogBase(BaseModel):
     tags: List[str]
     github_link: Optional[str] = None
     date: str
+    position: Optional[int] = 0
 
 class LearningLogCreate(LearningLogBase):
     pass

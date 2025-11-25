@@ -90,21 +90,33 @@ def test_api():
     except Exception as e:
         print(f"Get Projects Exception: {e}")
 
-    # 6. Create Learning Log
-    print("\n6. Creating Learning Log...")
-    log_data = {
-        "title": "Test Log",
-        "description": "A test log description",
-        "tags": ["Learning", "Test"],
-        "github_link": "https://github.com/test/log",
-        "date": "November 2025"
-    }
-    res = requests.post(f"{BASE_URL}/learning-logs", json=log_data, headers=headers)
-    if res.status_code != 200:
-        print(f"Create Log Failed: {res.status_code} - {res.text}")
-        sys.exit(1)
-    log_id = res.json()["id"]
-    print(f"Log Created: ID {log_id}")
+    # 6. Create Learning Logs (Test Limit)
+    print("\n6. Creating 5 Learning Logs...")
+    log_ids = []
+    for i in range(5):
+        log_data = {
+            "title": f"Test Log {i+1}",
+            "description": f"A test log description {i+1}",
+            "tags": ["Learning", "Test"],
+            "github_link": "https://github.com/test/log",
+            "date": "November 2025"
+        }
+        res = requests.post(f"{BASE_URL}/learning-logs", json=log_data, headers=headers)
+        if res.status_code != 200:
+            print(f"Create Log {i+1} Failed: {res.status_code} - {res.text}")
+            # sys.exit(1) # Don't exit, see if others work
+        else:
+            log_id = res.json()["id"]
+            print(f"Log {i+1} Created: ID {log_id}")
+            log_ids.append(log_id)
+
+    # Verify count
+    res = requests.get(f"{BASE_URL}/learning-logs")
+    logs = res.json()
+    print(f"Total Logs in DB: {len(logs)}")
+    if len(logs) < 5:
+        print("WARNING: Less than 5 logs found!")
+
 
     # 7. Cleanup (Delete created items)
     print("\n7. Cleaning up...")

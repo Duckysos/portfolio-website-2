@@ -160,6 +160,11 @@ def delete_learning_log(log_id: int, current_user: models.User = Depends(auth.ge
     crud.delete_learning_log(db, log_id)
     return {"message": "Log deleted"}
 
+@app.put("/learning-logs/reorder")
+def reorder_learning_logs(positions: list[dict], current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(auth.get_db)):
+    crud.update_learning_log_positions(db, positions)
+    return {"message": "Positions updated"}
+
 @app.post("/contact")
 async def submit_contact(form: ContactForm, request: Request, background_tasks: BackgroundTasks):
     # 1. Honeypot Check (Silent Rejection)

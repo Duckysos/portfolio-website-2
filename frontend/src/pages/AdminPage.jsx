@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import api from '../api';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const AdminPage = () => {
     const [activeTab, setActiveTab] = useState('projects');
@@ -13,6 +16,31 @@ const AdminPage = () => {
     const [projectForm, setProjectForm] = useState({ id: null, title: '', description: '', tags: '', github_link: '', color: 'var(--primary-color)', status: 'completed' });
     const [logForm, setLogForm] = useState({ title: '', description: '', tags: '', github_link: '', date: '' });
     const [isEditing, setIsEditing] = useState(false);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    const handleDragEnd = async (event) => {
+        const { active, over } = event;
+
+        if (active.id !== over.id) {
+            setLogs((items) => {
+                const oldIndex = items.findIndex((item) => item.id === active.id);
+                const newIndex = items.findIndex((item) => item.id === over.id);
+                const newItems = arrayMove(items, oldIndex, newIndex);
+
+                // Update backend
+                const positions = newItems.map((item, index) => ({ id: item.id, position: index }));
+                api.put('/learning-logs/reorder', positions).catch(err => console.error("Error reordering", err));
+
+                return newItems;
+            });
+        }
+    };
 
     useEffect(() => {
         fetchData();
@@ -206,15 +234,32 @@ const AdminPage = () => {
                         </div>
                         <div className="glass-panel" style={{ padding: '2rem', maxHeight: '600px', overflowY: 'auto' }}>
                             <h3 style={{ marginBottom: '1.5rem' }}>Existing Logs</h3>
-                            {logs.map(l => (
-                                <div key={l.id} style={{ padding: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <div>
-                                        <strong>{l.title}</strong>
-                                        <p style={{ fontSize: '0.8rem', color: '#aaa' }}>{l.date}</p>
-                                    </div>
-                                    <button onClick={() => handleDeleteLog(l.id)} style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}>Delete</button>
-                                </div>
-                            ))}
+                            <DndContext
+                                sensors={sensors}
+                                collisionDetection={closestCenter}
+                                onDragEnd={handleDragEnd}
+                            >
+                                <SortableContext
+                                    items={logs}
+                                    strategy={verticalListSortingStrategy}
+                                >
+                                    {logs.map(l => (
+                                        <SortableItem key={l.id} id={l.id}>
+                                            <div>
+                                                <strong>{l.title}</strong>
+                                                <p style={{ fontSize: '0.8rem', color: '#aaa' }}>{l.date}</p>
+                                            </div>
+                                            <button
+                                                onPointerDown={(e) => e.stopPropagation()} // Prevent drag when clicking delete
+                                                onClick={() => handleDeleteLog(l.id)}
+                                                style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}
+                                            >
+                                                Delete
+                                            </button>
+                                        </SortableItem>
+                                    ))}
+                                </SortableContext>
+                            </DndContext>
                         </div>
                     </div>
                 )}
@@ -239,6 +284,36 @@ const buttonStyle = {
     borderRadius: '5px',
     cursor: 'pointer',
     fontWeight: 'bold'
+};
+
+const SortableItem = (props) => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+    } = useSortable({ id: props.id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        ...props.style,
+        marginBottom: '1rem',
+        background: 'rgba(255,255,255,0.05)',
+        padding: '1rem',
+        borderRadius: '5px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        cursor: 'grab'
+    };
+
+    return (
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+            {props.children}
+        </div>
+    );
 };
 
 export default AdminPage;
