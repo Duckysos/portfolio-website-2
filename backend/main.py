@@ -34,6 +34,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+
+@app.middleware("http")
+async def handle_head_request(request: Request, call_next):
+    if request.method == "HEAD":
+        request.scope["method"] = "GET"
+        response = await call_next(request)
+        request.scope["method"] = "HEAD"
+        return response
+    return await call_next(request)
+
 # Email Configuration
 mail_username = os.getenv("MAIL_USERNAME")
 mail_password = os.getenv("MAIL_PASSWORD")
@@ -200,3 +211,7 @@ async def submit_contact(form: ContactForm, request: Request, background_tasks: 
     background_tasks.add_task(fm.send_message, message)
     
     return {"message": "Message sent successfully"}
+
+@app.get('/health')
+def health_check():
+    return {"status": "healthy"}
