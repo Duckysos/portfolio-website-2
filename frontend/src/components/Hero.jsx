@@ -77,7 +77,7 @@ const Hero = () => {
                         color: 'white'
                     }}
                 >
-                    Full Stack ML Engineer
+                    DATA ENGINEER
                 </motion.h3>
                 <motion.p
                     initial={{ opacity: 0 }}
@@ -91,7 +91,7 @@ const Hero = () => {
                         padding: '0 1rem'
                     }}
                 >
-                    I like working with data :)
+                    Currently looking for a job!
                 </motion.p>
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}

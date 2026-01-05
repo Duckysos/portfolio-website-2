@@ -138,13 +138,11 @@ const AdminPage = () => {
     };
 
     const handleDeleteLog = async (id) => {
-        if (window.confirm('Are you sure?')) {
-            try {
-                await api.delete(`/learning-logs/${id}`);
-                fetchData();
-            } catch (err) {
-                console.error(err);
-            }
+        try {
+            await api.delete(`/learning-logs/${id}`);
+            fetchData();
+        } catch (err) {
+            console.error(err);
         }
     };
 
